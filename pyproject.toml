@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "aevopy"
+version = "0.1.0"
+description = "Simple client for aevo.xyz API"
+authors = ["crjameson <93468664+crjameson@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "aevopy", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+loguru = "^0.7.2"
+eip712-structs-ng = "^2.0.1"
+python-dotenv = "^1.0.0"
+eth-account = "^0.10.0"
+dacite = "^1.8.1"
+typing-extensions = "^4.9.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.4"
+coverage = "^7.4.0"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
