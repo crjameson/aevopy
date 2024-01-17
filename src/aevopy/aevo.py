@@ -29,7 +29,6 @@ AEVO_MAINNET = {
             "chainId": "1",
         },
     }
-AEVO_STEP_SIZE = 0.0001
 
 class AevoClient():
     def __init__(self, account=None, env="testnet"):
@@ -55,18 +54,17 @@ class AevoClient():
         self.session.headers.update(self.rest_headers)
         
     def is_authenticated(self):
-        request = self.session.get(f"{self.rest_url}/auth")
-        if "success" in request.json():
+        response = self.session.get(f"{self.rest_url}/auth")
+        if "success" in response.json():
             return True
         else:
             return False
         
     def _convert_price(self, price, decimals=6):
         """ aevo uses 6 decimals for all pricings and int values - so we convert it and also take care of the step size"""
-        converted_price = int(round(price, decimals) * 10**decimals)
-        scale = int(1 / AEVO_STEP_SIZE)
-        rounded_price = (converted_price // scale) * scale
-        return str(int(rounded_price))
+        truncated_price = int(price * 10000) / 10000.0 # this is the step size and the smallest price change of 0.0001
+        converted_price = truncated_price * 10**decimals
+        return str(int(converted_price))
     
     def get_portfolio(self):
         portfolio_json = self.session.get(f"{self.rest_url}/portfolio").json()
