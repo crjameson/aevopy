@@ -7,8 +7,8 @@ import requests
 from dacite import from_dict, Config as DaciteConfig
 DACITE_CONFIG = DaciteConfig(cast=[int, float])
 from functools import partialmethod  # partial method passes self - partial doesnt
-from .exceptions import AevoException
-from aevopy.models import AevoAccount, OrderDetails, Order, Portfolio
+from .exceptions import AevoException, UnauthorizedException
+from aevopy.models import AevoAccount, OrderDetails, Order, Portfolio, Position
 
 AEVO_TESTNET = {
         "rest_url": "https://api-testnet.aevo.xyz",
@@ -76,6 +76,20 @@ class AevoClient():
         except Exception as e:
             #TODO: handle this better
             print(portfolio_json)
+            raise e
+        
+    def get_positions(self, wallet_address=None):
+        if wallet_address is None:
+            wallet_address = self.account.wallet_address
+        positions_json = self.session.get(f"{self.rest_url}/positions").json()
+        if "error" in positions_json:
+                raise AevoException(positions_json["error"])
+        try:
+            positions = [from_dict(data_class=Position, data=position, config=DACITE_CONFIG) for position in positions_json["positions"]]
+            return positions
+        except Exception as e:
+            #TODO: handle this better
+            print(positions_json)
             raise e
         
     def create_order(

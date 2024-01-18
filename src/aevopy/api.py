@@ -1,3 +1,4 @@
+import time
 import requests
 from loguru import logger
 from .models import IndexPrice, Instrument
@@ -6,24 +7,24 @@ from dacite import from_dict, Config as DaciteConfig
 
 DACITE_CONFIG = DaciteConfig(cast=[int, float])
 headers = {"accept": "application/json"}
-
+AEVO_API = "https://api.aevo.xyz"
 
 def get_assets():
-    response = requests.get("https://api.aevo.xyz/assets", headers=headers).json()
+    response = requests.get(f"{AEVO_API}/assets", headers=headers).json()
     return response
 
 
 def get_expiries(asset: str):
-    response = requests.get("https://api.aevo.xyz/expiries", headers=headers).json()
+    response = requests.get(f"{AEVO_API}/expiries", headers=headers).json()
     return response
 
 
 def get_index(asset: str) -> IndexPrice:
-    response = requests.get(f"https://api.aevo.xyz/index?asset={asset}", headers=headers).json()
+    response = requests.get(f"{AEVO_API}/index?asset={asset}", headers=headers).json()
     return from_dict(data_class=IndexPrice, data=response, config=DACITE_CONFIG)
 
 def get_markets(asset: str = "", type=""):
-    request_url = "https://api.aevo.xyz/markets"
+    request_url = f"{AEVO_API}/markets"
     if asset:
         request_url += f"?asset={asset}"
     if type:
@@ -38,6 +39,16 @@ def get_markets(asset: str = "", type=""):
         return instruments[0]
     else:
         return instruments
+    
+def get_index_history(asset: str, resolution: int = 30, start_time: int = 0, end_time: int = 0):
+    if start_time == 0:
+        # take the last hour by default
+        start_time = int(time.time()) - 300
+    if end_time == 0:
+        # always till now by default
+        end_time = int(time.time())
+    response = requests.get(f"{AEVO_API}/index-history?asset={asset}&resolution={resolution}&start_time={start_time}&end_time={end_time}", headers=headers).json()
+    return response
 
 
 def create_order(

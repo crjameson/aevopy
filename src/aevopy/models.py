@@ -45,7 +45,7 @@ class Instrument():
     underlying_asset: str
     quote_asset: str
     price_step: float
-    amount_step: int
+    amount_step: float
     min_order_value: float
     mark_price: float
     index_price: float
@@ -100,3 +100,29 @@ class Portfolio():
     sharpe_ratio: float
     greeks: List[Greek]
     user_margin: UserMargin
+
+@dataclass
+class Trigger:
+    order_id: str
+    trigger: str
+
+@dataclass
+class PositionTriggers:
+    take_profit: Trigger
+    stop_loss: Trigger
+
+@dataclass(slots=True, kw_only=True)
+class Position():
+    asset:str
+    instrument_id: int
+    instrument_name: str
+    instrument_type: str
+    amount: float
+    side: str
+    mark_price: float
+    avg_entry_price: float
+    unrealized_pnl: float
+    maintenance_margin: float
+    liquidation_price: float
+    margin_type: str
+    triggers: PositionTriggers
