@@ -7,7 +7,7 @@ import requests
 from dacite import from_dict, Config as DaciteConfig
 DACITE_CONFIG = DaciteConfig(cast=[int, float])
 from functools import partialmethod  # partial method passes self - partial doesnt
-from .exceptions import AevoException, UnauthorizedException
+from .exceptions import AevoException, ConfigurationException, UnauthorizedException
 from aevopy.models import AevoAccount, OrderDetails, Order, Portfolio, Position
 
 AEVO_TESTNET = {
@@ -33,11 +33,23 @@ AEVO_MAINNET = {
 class AevoClient():
     def __init__(self, account=None, env="testnet"):
         self.account = AevoAccount.from_env() if account is None else account
+        if not self.account.signing_key:
+            raise ConfigurationException("signing_key is missing")
+        if not self.account.wallet_address:
+            raise ConfigurationException("wallet_address is missing")
+        if not self.account.api_key:
+            raise ConfigurationException("api_key is missing")
+        if not self.account.api_secret:
+            raise ConfigurationException("api_secret is missing")
+        if not self.account.env:
+            raise ConfigurationException("env is missing")
+        
         self.rest_headers = {
             "accept": "application/json",
             "AEVO-KEY": self.account.api_key,
             "AEVO-SECRET": self.account.api_secret,
         }
+
         self.env = self.account.env
         if self.env == "testnet":
             self.rest_url = AEVO_TESTNET["rest_url"]
@@ -48,7 +60,7 @@ class AevoClient():
             self.ws_url = AEVO_MAINNET["ws_url"]
             self.signing_domain = make_domain(AEVO_MAINNET["signing_domain"]["name"], AEVO_MAINNET["signing_domain"]["version"], AEVO_MAINNET["signing_domain"]["chainId"])
         else:
-            raise ValueError("env must be either testnet or mainnet")
+            raise ConfigurationException("env must be either testnet or mainnet")
         # using a session here for connection pooling and auth
         self.session = requests.Session()
         self.session.headers.update(self.rest_headers)
@@ -61,8 +73,8 @@ class AevoClient():
             return False
         
     def _convert_price(self, price, decimals=6):
-        """ aevo uses 6 decimals for all pricings and int values - so we convert it and also take care of the step size"""
-        truncated_price = int(price * 10000) / 10000.0 # this is the step size and the smallest price change of 0.0001
+        """ aevo uses 6 decimals for all pricings and int values - so we convert it"""
+        truncated_price = int(price * 10000) / 10000.0 # this is the smallest price change of 0.0001
         converted_price = truncated_price * 10**decimals
         return str(int(converted_price))
     
@@ -74,9 +86,7 @@ class AevoClient():
             portfolio = from_dict(data_class=Portfolio, data=portfolio_json, config=DACITE_CONFIG)
             return portfolio
         except Exception as e:
-            #TODO: handle this better
-            print(portfolio_json)
-            raise e
+            raise AevoException(f"invalid data: {e}")
         
     def get_positions(self, wallet_address=None):
         if wallet_address is None:
@@ -88,9 +98,7 @@ class AevoClient():
             positions = [from_dict(data_class=Position, data=position, config=DACITE_CONFIG) for position in positions_json["positions"]]
             return positions
         except Exception as e:
-            #TODO: handle this better
-            print(positions_json)
-            raise e
+            raise AevoException(f"invalid data: {e}")
         
     def create_order(
             self,
@@ -109,7 +117,6 @@ class AevoClient():
         timestamp = int(time.time())
         salt = randint(0, 10**6)
         # no limit price set means market order - so we just set the limits very high/low 
-        # i hope one day this code breaks when BTC is > 10^6 USD ;)
         if limit_price is None:
             limit_price = 2**256-1 if is_buy else 0  
         else:
@@ -172,3 +179,4 @@ class AevoClient():
     buy_stop_loss = partialmethod(create_order, is_buy=False, amount=0, stop="STOP_LOSS", reduce_only=True,  close_position=True)
     buy_take_profit = partialmethod(create_order, is_buy=False, amount=0, stop="TAKE_PROFIT", reduce_only=True, close_position=True)
     #TODO: trailing stop method would be useful, which updates the current stop_loss and take profit based on the current index price
+    #TODO: close all function would be useful, which closes all positions at once

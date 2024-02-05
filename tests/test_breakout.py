@@ -66,3 +66,6 @@ def test_run_trading_strategy_with_positions(mocker):
     # Check that the buy and sell methods were not called
     assert client.buy.call_count == 0
     assert client.sell.call_count == 0
+
+
+    #TODO: needs more testing ... 

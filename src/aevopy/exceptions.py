@@ -2,6 +2,10 @@ class AevoException(Exception):
     """Base class for exceptions in this module."""
     pass
 
+class ConfigurationException(AevoException):
+    """Base class for exceptions in this module."""
+    pass
+
 class UnauthorizedException(AevoException):
     """Exception raised for 401 Unauthorized status code."""
     def __init__(self, message="UNAUTHORIZED"):

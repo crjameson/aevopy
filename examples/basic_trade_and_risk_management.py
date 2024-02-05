@@ -8,7 +8,7 @@ client = aevopy.AevoClient()
 print(f"client: {client.account.wallet_address}")
 
 # every trading system begins with some risk management params
-# how much leverage do we want to use - this also depends on the asset but for the big ones 20x is the max
+# how much leverage do we want to use - this also depends on the asset but for the big ones like ETH 20x is the max
 leverage = 20
 # how much of our initial balance do we want to risk per trade in percent
 risk_per_trade_percent = 3
@@ -34,6 +34,7 @@ instrument = aevopy.get_markets(asset="TIA")
 print(f"instrument: {instrument}")
 
 # now create our first order and buy as much TIA as we can affort with our position margin
+# make sure it is at least 1 TIA, if you're trying with less margin, set the position size to 1 TIA
 position_size = int(margin_per_position // instrument.index_price)
 order = client.buy_market(instrument.instrument_id, amount=position_size)
 print(f"order: {order} order_id: {order.order_id} avg_price: {order.avg_price}")

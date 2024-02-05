@@ -62,6 +62,7 @@ def run_trading_strategy(client, instrument, margin_per_position, last_prices):
         if price.price > max:
             print(f"price: {price.price} is above max: {max} - open long position")
             buy(client, instrument, position_size)
+            # we reset the queue after we opened a position
             last_prices.clear()
         if price.price < min:
             print(f"price: {price.price} is below min: {min} - open short position")
@@ -72,6 +73,7 @@ def run_trading_strategy(client, instrument, margin_per_position, last_prices):
 
 
 if __name__ == "__main__":
+    # the client takes the API key and secret from the environment
     client = aevopy.AevoClient()
     print(f"client: {client.account.wallet_address} collecting data and start trading...")
     portfolio = client.get_portfolio()
