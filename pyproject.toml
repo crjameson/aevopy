@@ -2,7 +2,7 @@
 name = "aevopy"
 version = "0.1.0"
 description = "Simple client for aevo.xyz API"
-authors = ["crjameson <93468664+crjameson@users.noreply.github.com>"]
+authors = ["crjamesonxyz@proton.me>"]
 readme = "README.md"
 packages = [{include = "aevopy", from = "src"}]
 
