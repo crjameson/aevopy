@@ -49,6 +49,14 @@ take_profit_price = order.avg_price * 1.02
 order = client.sell_stop_loss(instrument.instrument_id, trigger=stop_loss_price)
 order = client.sell_take_profit(instrument.instrument_id, trigger=take_profit_price)
 ```
+If you need to work with multiple Accounts, you can create an account object and pass that as parameter to the client:
+
+```
+account = aevopy.AevoAccount(key, wallet_address, api_key, api_secret, env)
+...
+client = aevopy.AevoClient(account)
+
+```
 
 ## Installation
 
@@ -61,9 +69,9 @@ Or if you are using poetry:
 poetry add aevopy
 ```
 Alternative:
-
+```
 From github: pip install pip@git+https://github.com/crjameson/aevopy
- 
+```
 Create a .env file with your credentials in the same directory as your script is running. Take a look at .env.example in the examples folder.
 This file should at least configure the following values:
 
