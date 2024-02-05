@@ -1,7 +1,7 @@
 # Aevopy
 
 Aevopy is a python client for the perp and options trading platform aevo.xyz. It is still in a very early stage, but maybe
-useful if you considering automated crypto currency trading. 
+useful if you consider automated crypto currency trading. 
 
 For signup with Aevo you can use this link to save on fees:
 
@@ -52,19 +52,42 @@ order = client.sell_take_profit(instrument.instrument_id, trigger=take_profit_pr
 
 ## Installation
 
-Pypi following soon, for now use poetry. Put a .env file with your credentials in the same directory as your script is running. Take a look at .env.example in the examples folder.
+Recommended:
+```
+pip install aevopy
+```
+Or if you are using poetry:
+```
+poetry add aevopy
+```
+Alternative:
+
+From github: pip install pip@git+https://github.com/crjameson/aevopy
+ 
+Create a .env file with your credentials in the same directory as your script is running. Take a look at .env.example in the examples folder.
+This file should at least configure the following values:
+
+```
+AEVO_SIGNING_KEY = 
+AEVO_WALLET_ADDRESS = 
+AEVO_API_KEY =
+AEVO_API_SECRET =
+AEVO_ENV = mainnet
+```
+Hint: You can create the signing key and API credentials in your userprofile settings on aevo.xyz.
+
 
 To run the example:
-
+```
 poetry run python examples/basic_trade_and_risk_management.py
+```
 
 To run the tests:
 
+```
 poetry run pytest
-
+```
 
 ## Contact
 
-For questions or ideas write me a DM on twitter here:
-
-https://twitter.com/crjameson_
+For questions or ideas you can find my contact information on crjameson.xyz
