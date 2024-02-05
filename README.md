@@ -51,7 +51,7 @@ order = client.sell_take_profit(instrument.instrument_id, trigger=take_profit_pr
 ```
 If you need to work with multiple Accounts, you can create an account object and pass that as parameter to the client:
 
-```
+```python
 account = aevopy.AevoAccount(key, wallet_address, api_key, api_secret, env)
 ...
 client = aevopy.AevoClient(account)
