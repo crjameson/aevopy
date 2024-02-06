@@ -1,6 +1,5 @@
 import time
 import requests
-from loguru import logger
 from .models import IndexPrice, Instrument
 from .aevo import AevoClient
 from dacite import from_dict, Config as DaciteConfig
